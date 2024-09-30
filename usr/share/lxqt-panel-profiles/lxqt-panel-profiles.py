@@ -30,7 +30,7 @@ class FileListViewer(QWidget):
         self.main_layout.addWidget(self.view)
 
         # Auto-load directories from the specified path that contain a 'panel.conf' file
-        self.user_layouts_dir = os.path.expanduser("~/.local/share/lxqt/layouts")
+        self.user_layouts_dir = os.path.expanduser("~/.local/share/lxqt-panel-profiles/layouts")
         self.load_directories_with_panel_conf(self.user_layouts_dir)
 
         # Create a horizontal layout for the buttons

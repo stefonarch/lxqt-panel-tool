@@ -2,7 +2,7 @@
 if [ -d ".local/share/lxqt/layouts" ]; then
 python3 /usr/share/lxqt-panel-profiles/lxqt-panel-profiles.py
 else
-mkdir -p .local/share/lxqt/
-cp -r /usr/share/lxqt-panel-profiles/layouts .local/share/lxqt
+mkdir -p .local/share/lxqt-panel-profiles/
+cp -r /usr/share/lxqt-panel-profiles/layouts .local/share/lxqt-panel-profiles
 python3 /usr/share/lxqt-panel-profiles/lxqt-panel-profiles.py
 fi
