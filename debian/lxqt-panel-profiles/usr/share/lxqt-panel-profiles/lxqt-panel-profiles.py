@@ -1,6 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QListView, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QMessageBox, QFileDialog, QInputDialog
 from PyQt6.QtCore import QStringListModel, QDir, Qt
-from PyQt6.QtGui import QIcon
 import sys
 import os
 import shutil
@@ -17,88 +16,103 @@ class FileListViewer(QWidget):
     def __init__(self):
         super().__init__()
 
+        # Set up the main layout (vertical layout)
         self.main_layout = QVBoxLayout()
+
+        # Create a NonEditableStringListModel
         self.model = NonEditableStringListModel()
+
+        # Create a QListView and set the model
         self.view = QListView()
         self.view.setModel(self.model)
+
+        # Add the QListView to the main layout
         self.main_layout.addWidget(self.view)
-        self.user_layouts_dir = os.path.expanduser("~/.local/share/lxqt-panel-profiles/layouts")
+
+        # Auto-load directories from the specified path that contain a 'panel.conf' file
+        self.user_layouts_dir = os.path.expanduser("~/.local/share/lxqt/layouts")
         self.load_directories_with_panel_conf(self.user_layouts_dir)
 
-
+        # Create a horizontal layout for the buttons
         self.button_layout = QHBoxLayout()
 
-        self.button1 = QPushButton()  # Import button
-        self.button2 = QPushButton()  # Apply button
-        self.button3 = QPushButton()  # Rename button
-        self.button4 = QPushButton()  # Delete button
-        self.button5 = QPushButton()  # Share button
+        # Create five buttons
+        self.button1 = QPushButton("Import")  # Import button
+        self.button2 = QPushButton("Apply")  # Apply button
+        self.button3 = QPushButton("Rename")  # Rename button
+        self.button4 = QPushButton("Delete")  # Delete button
+        self.button5 = QPushButton("Share")  # Share button
 
-
+        # Connect the Import button to the import function
         self.button1.clicked.connect(self.import_panel_layout)
-        self.button1.setIcon(QIcon.fromTheme('go-down'))
-        self.button1.setToolTip('Import')
 
         # Connect the Apply button to the copy function
         self.button2.clicked.connect(self.copy_panel_conf)
-        self.button2.setIcon(QIcon.fromTheme('gtk-apply'))
-        self.button2.setToolTip('Apply')
 
-        # Rename button
+        # Connect the Rename button to the rename function
         self.button3.clicked.connect(self.rename_selected_directory)
-        self.button3.setIcon(QIcon.fromTheme('font'))
-        self.button3.setToolTip('Rename')
 
-        # Delete button
+        # Connect the Delete button to the delete function
         self.button4.clicked.connect(self.delete_selected_directory)
-        self.button4.setIcon(QIcon.fromTheme('user-trash'))
-        self.button4.setToolTip('Delete')
 
-
-        # Share button
+        # Connect the Share button to the share function
         self.button5.clicked.connect(self.share_selected_directory)
-        self.button5.setIcon(QIcon.fromTheme('go-up'))
-        self.button5.setToolTip('Share')
 
+        # Add buttons to the horizontal layout
         self.button_layout.addWidget(self.button1)
         self.button_layout.addWidget(self.button2)
         self.button_layout.addWidget(self.button3)
         self.button_layout.addWidget(self.button4)
         self.button_layout.addWidget(self.button5)
+
+        # Add the button layout to the main layout (at the bottom)
         self.main_layout.addLayout(self.button_layout)
 
+        # Create a Close button at the bottom
         self.close_button = QPushButton("Close")
         self.close_button.clicked.connect(self.close)  # Connect to the close method
         self.main_layout.addWidget(self.close_button)  # Add Close button to the main layout
 
+        # Set the layout to the window
         self.setLayout(self.main_layout)
         self.setWindowTitle("LXQt Panel Layouts")
 
     def load_directories_with_panel_conf(self, directory_path):
+        # Use QDir to get a list of directories
         dir = QDir(directory_path)
         # List only directories (no files)
         dir.setFilter(QDir.Filter.Dirs | QDir.Filter.NoDotAndDotDot)
+
         directories = dir.entryList()
+
+        # Filter out directories that do not contain a 'panel.conf' file
         valid_directories = []
         for directory in directories:
             full_path = os.path.join(directory_path, directory)
+            # Check if 'panel.conf' exists in the directory
             if os.path.exists(os.path.join(full_path, "panel.conf")):
                 valid_directories.append(directory)
 
+        # Add "Current Layout" as the first entry
         if "Current Layout" not in valid_directories:
             valid_directories.insert(0, "Current Layout")
 
+        # Update the model with the list of valid directories
         self.model.setStringList(valid_directories)
 
     def import_panel_layout(self):
-        options = QFileDialog.Option(0)
+        # Open a file dialog to select a tar.gz file
+        options = QFileDialog.Option(0)  # No specific options
         file_name, _ = QFileDialog.getOpenFileName(self, "Import Panel Layout", "", "Tar Files (*.tar.gz);;All Files (*)", options=options)
 
         if file_name:
+            # Extract the tar.gz file to the layouts directory
             try:
                 with tarfile.open(file_name, "r:gz") as tar:
+                    # Extract to user layouts directory
                     tar.extractall(path=self.user_layouts_dir)
                 
+                # Check if the extracted directory contains 'panel.conf'
                 extracted_dirs = os.listdir(self.user_layouts_dir)
                 valid_layout = False
                 for directory in extracted_dirs:
@@ -266,7 +280,9 @@ class FileListViewer(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     
+    # Create an instance of the FileListViewer
     viewer = FileListViewer()
     viewer.show()
     
+    # Run the application
     sys.exit(app.exec())
