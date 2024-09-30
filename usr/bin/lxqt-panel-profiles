@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ -d ".local/share/lxqt/layouts" ]; then
+if [ -d ".local/share/lxqt-panel-profiles/layouts" ]; then
 python3 /usr/share/lxqt-panel-profiles/lxqt-panel-profiles.py
 else
 mkdir -p .local/share/lxqt-panel-profiles/
