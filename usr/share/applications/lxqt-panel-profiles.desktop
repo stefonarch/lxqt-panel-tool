@@ -7,3 +7,11 @@ OnlyShowIn=LXQt;
 
 Name=Panel Profiles
 Comment=Backup and restore your panel configuration
+Name[de]=Panel-Profile
+Comment[de]=Sicherung und Wiederherstellung der Panel-Konfiguration
+Name[es]=Perfiles de panel
+Comment[es]=Copia de seguridad y restauración de la configuración del panel
+Name[fr]=Profils de panneaux
+Comment[fr]=Sauvegarde et restauration de la configuration de votre panel
+Name[hu]=Panel profilok
+Comment[hu]=Biztonsági mentés és visszaállítás a panel konfigurációjáról
