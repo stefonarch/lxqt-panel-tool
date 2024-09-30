@@ -1,12 +1,14 @@
 Source: lxqt-panel-profiles
 Priority: optional
+Version: 1.0
 Maintainer: John Faulk <johnny.faulk00@yahoo.com>
-Build-Depends: debhelper (>= 9)
+Build-Depends: debhelper (>= 9), debhelper-compat (>=10)
 Standards-Version: 3.9.5
 
 Package: lxqt-panel-profiles
 Architecture: all
-Depends: python3-pyqt6 lxqt-panel tar
+Version: 1.0
+Depends: python3-pyqt6, lxqt-panel, tar
 Description: LXQt Panel Layout Manager
  A Layout Manager for LXQT that allows 
  backing up and restoring panel configurations
