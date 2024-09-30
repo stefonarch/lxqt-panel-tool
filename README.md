@@ -1,1 +1,2 @@
-# PLACEHOLDER TEXT
+# LXQt Panel Profiles
+
