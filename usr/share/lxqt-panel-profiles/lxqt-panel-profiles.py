@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QListView, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QMessageBox, QFileDialog, QInputDialog
+from PyQt6.QtWidgets import QApplication, QListView, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QMessageBox, QFileDialog, QInputDialog, QStyle
 from PyQt6.QtCore import QStringListModel, QDir, Qt
 from PyQt6.QtGui import QIcon
 import sys
@@ -36,28 +36,28 @@ class FileListViewer(QWidget):
 
 
         self.button1.clicked.connect(self.import_panel_layout)
-        self.button1.setIcon(QIcon.fromTheme('go-down'))
+        self.button1.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ArrowDown))
         self.button1.setToolTip('Import')
 
         # Connect the Apply button to the copy function
         self.button2.clicked.connect(self.copy_panel_conf)
-        self.button2.setIcon(QIcon.fromTheme('gtk-apply'))
+        self.button2.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogApplyButton))
         self.button2.setToolTip('Apply')
 
         # Rename button
         self.button3.clicked.connect(self.rename_selected_directory)
-        self.button3.setIcon(QIcon.fromTheme('font'))
+        self.button3.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_BrowserReload))
         self.button3.setToolTip('Rename')
 
         # Delete button
         self.button4.clicked.connect(self.delete_selected_directory)
-        self.button4.setIcon(QIcon.fromTheme('user-trash'))
+        self.button4.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_TrashIcon))
         self.button4.setToolTip('Delete')
 
 
         # Share button
         self.button5.clicked.connect(self.share_selected_directory)
-        self.button5.setIcon(QIcon.fromTheme('go-up'))
+        self.button5.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ArrowUp))
         self.button5.setToolTip('Share')
 
         self.button_layout.addWidget(self.button1)
