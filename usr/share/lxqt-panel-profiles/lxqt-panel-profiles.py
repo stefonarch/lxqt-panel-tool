@@ -169,7 +169,6 @@ class FileListViewer(QWidget):
             try:
                 shutil.rmtree(directory_path)  # Delete the directory and its contents
                 self.model.removeRow(selected_index.row())  # Remove the directory from the list view
-                QMessageBox.information(self, "Deleted", f"Panel Layout '{selected_directory}' has been deleted.")
             except PermissionError:
                 QMessageBox.critical(self, "Permission Denied", f"Failed to delete directory: Permission denied.")
             except Exception as e:
