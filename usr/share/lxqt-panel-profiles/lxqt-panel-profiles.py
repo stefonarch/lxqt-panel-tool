@@ -113,7 +113,6 @@ class FileListViewer(QWidget):
                 else:
                     # If valid layout, update the view
                     self.load_directories_with_panel_conf(self.user_layouts_dir)
-                    QMessageBox.information(self, "Success", "Panel layout imported successfully!")
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed to import panel layout: {str(e)}")
 
@@ -139,8 +138,6 @@ class FileListViewer(QWidget):
             shutil.copy(source_file, destination_file)
 	    # Restart lxqt-panel
             subprocess.run("killall lxqt-panel && lxqt-panel &", shell=True, check=True)
-
-            QMessageBox.information(self, "Success", "Panel Layout applied successfully.")
         except PermissionError:
             QMessageBox.critical(self, "Permission Denied", f"Failed to copy panel.conf: Permission denied.")
         except Exception as e:
