@@ -1,6 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QListView, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QMessageBox, QFileDialog, QInputDialog, QStyle
 from PyQt6.QtCore import QStringListModel, QDir, Qt
-from PyQt6.QtGui import QIcon
 import sys
 import os
 import shutil
