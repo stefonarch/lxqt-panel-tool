@@ -27,43 +27,51 @@ class FileListViewer(QWidget):
 
         self.button_layout = QHBoxLayout()
 
-        self.button1 = QPushButton()  # Import button
-        self.button2 = QPushButton()  # Apply button
-        self.button3 = QPushButton()  # Rename button
-        self.button4 = QPushButton()  # Delete button
-        self.button5 = QPushButton()  # Share button
+        self.button1 = QPushButton()  # Import
+        self.button2 = QPushButton()  # Apply
+        self.button3 = QPushButton()  # Rename
+        self.button4 = QPushButton()  # Delete
+        self.button5 = QPushButton()  # Save current layout
+        self.button6 = QPushButton()  # Share
 
-
+        
+        # Import Layout
         self.button1.clicked.connect(self.import_panel_layout)
         self.button1.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ArrowDown))
         self.button1.setToolTip('Import')
 
-        # Connect the Apply button to the copy function
+        # Apply
         self.button2.clicked.connect(self.copy_panel_conf)
         self.button2.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogApplyButton))
         self.button2.setToolTip('Apply')
 
-        # Rename button
+        # Rename
         self.button3.clicked.connect(self.rename_selected_directory)
         self.button3.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_BrowserReload))
         self.button3.setToolTip('Rename')
 
-        # Delete button
+        # Delete
         self.button4.clicked.connect(self.delete_selected_directory)
         self.button4.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_TrashIcon))
         self.button4.setToolTip('Delete')
+        
+        # Save current Layout
+        self.button5.clicked.connect(self.save_current_layout)
+        self.button5.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirHomeIcon))
+        self.button5.setToolTip('Save current layout')
 
 
-        # Share button
-        self.button5.clicked.connect(self.share_selected_directory)
-        self.button5.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ArrowUp))
-        self.button5.setToolTip('Share')
+        # Share
+        self.button6.clicked.connect(self.share_selected_directory)
+        self.button6.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ArrowUp))
+        self.button6.setToolTip('Share')
 
         self.button_layout.addWidget(self.button1)
         self.button_layout.addWidget(self.button2)
         self.button_layout.addWidget(self.button3)
         self.button_layout.addWidget(self.button4)
         self.button_layout.addWidget(self.button5)
+        self.button_layout.addWidget(self.button6)
         self.main_layout.addLayout(self.button_layout)
 
         self.close_button = QPushButton("Close")
@@ -206,6 +214,39 @@ class FileListViewer(QWidget):
                 QMessageBox.information(self, "Renamed", f"Layout renamed to '{new_name}'.")
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed to rename layout: {str(e)}")
+                
+                
+    def save_current_layout(self):
+        # Get the name for the new layout
+        new_name, ok = QInputDialog.getText(self, "Save Current Layout", "Enter layout name:")
+
+        if ok and new_name:
+            # Ensure the new name is not empty and doesn't already exist
+            new_name = new_name.strip()
+            if not new_name:
+                QMessageBox.warning(self, "Invalid Name", "Name cannot be empty.")
+                return
+            new_path = os.path.join(self.user_layouts_dir, new_name)
+
+            if os.path.exists(new_path):
+                QMessageBox.warning(self, "Duplicate Name", "A layout with this name already exists.")
+                return
+
+            try:
+                # Create the new directory for the layout
+                os.makedirs(new_path)
+
+                # Copy the current layout (panel.conf) to the new directory
+                current_layout_file = os.path.expanduser("~/.config/lxqt/panel.conf")
+                shutil.copy(current_layout_file, os.path.join(new_path, "panel.conf"))
+
+                # Reload the view to include the new layout
+                self.load_directories_with_panel_conf(self.user_layouts_dir)
+
+                QMessageBox.information(self, "Success", f"Current layout saved as '{new_name}'.")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to save layout: {str(e)}")
+
 
     def share_selected_directory(self):
         # Get the selected index from the QListView
