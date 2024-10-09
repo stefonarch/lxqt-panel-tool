@@ -43,7 +43,7 @@ class FileListViewer(QWidget):
         # Apply
         self.button2.clicked.connect(self.copy_panel_conf)
         self.button2.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogApplyButton))
-        self.button2.setToolTip('Apply')
+        self.button2.setToolTip('Use selected profile')
 
         # Rename
         self.button3.clicked.connect(self.rename_selected_directory)
