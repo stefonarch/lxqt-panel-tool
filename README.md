@@ -2,8 +2,7 @@
 ## About
 LXQt Panel Profiles is a program intended create an equivalent to XFCE's panel profiles program for LXQt. Users of this program will find that it behaves very similarly.
 
-## Installation
-### For Debian:
+## Build the Debian Package
 
 ```
 cd lxqt-panel-profiles
@@ -20,5 +19,41 @@ cd ..
 sudo apt install ./lxqt-panel-profiles*.deb
 ```
 
-### Arch: 
+## Manual Installation
+
+First, install the dependencies on your system. Note: Some Fedora verisons are still using the Qt5 version of 
+LXQt. This will not affect core functionality, but it WILL cause LXQt Panel Profiles to not follow the set system
+theme on those systems. 
+
+### Fedora 41: 
+```
+sudo dnf install lxqt-panel tar python3-pyqt6 qt6-qdbusviewer
+```
+### Fedora 40: 
+```
+sudo dnf install lxqt-panel tar python3-pyqt6 qt5-qdbusviewer
+```
+
+### Alpine Linux Edge: 
+```
+apk add lxqt-panel tar py3-pyqt6 qt6-qdbusviewer
+```
+
+### Arch Linux:
+```
+sudo pacman -S lxqt-panel tar python-pyqt6 qt6-tools
+```
+
+### Then for ALL of them:
+```
+cd lxqt-panel-profiles
+cp -a usr/* /usr/
+```
+
+And done!
+
+
+## Screenshots
+
 TODO
+
