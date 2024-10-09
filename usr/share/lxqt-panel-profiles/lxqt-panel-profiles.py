@@ -144,7 +144,8 @@ class FileListViewer(QWidget):
         try:
             shutil.copy(source_file, destination_file)
 	    # Restart lxqt-panel
-            subprocess.run("killall lxqt-panel && lxqt-panel &", shell=True, check=True)
+            subprocess.run("qdbus org.lxqt.session /LXQtSession org.lxqt.session.stopModule lxqt-panel.desktop; sleep 1", shell=True, check=True)
+            subprocess.run("qdbus org.lxqt.session /LXQtSession org.lxqt.session.startModule lxqt-panel.desktop", shell=True, check=True)
         except PermissionError:
             QMessageBox.critical(self, "Permission Denied", f"Failed to copy panel.conf: Permission denied.")
         except Exception as e:
