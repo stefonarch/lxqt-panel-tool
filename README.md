@@ -2,7 +2,7 @@
 ## About
 LXQt Panel Profiles is a program intended create an equivalent to XFCE's panel profiles program for LXQt. Users of this program will find that it behaves very similarly.
 
-## Build the Debian Package
+## Build the Debian Package (Debian 12 or higher)
 
 ```
 cd lxqt-panel-profiles
