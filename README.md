@@ -55,5 +55,11 @@ And done!
 
 ## Screenshots
 
-TODO
+### MX Linux
+![img](screenshots/MX Linux.jpg)
 
+### MATE
+![img](screenshots/MATE-profile.jpg)
+
+### Redmond (win95)
+![img](screenshots/Redmond.jpg)
