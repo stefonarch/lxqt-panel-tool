@@ -22,8 +22,8 @@ sudo apt install ./lxqt-panel-profiles*.deb
 ## Manual Installation
 
 First, install the dependencies on your system.
-Note: Some Fedora versions are still using the Qt5 version of LXQt. This will not affect core functionality,
- but it WILL cause LXQt Panel Profiles not following the themes on those systems.
+Note: As is also the case with Debian and Ubuntu, some Fedora versions are still using the Qt5 version of LXQt. 
+This will not affect core functionality, but it WILL cause LXQt Panel Profiles not following the themes on those systems.
 
 ### Fedora 41:
 ```
