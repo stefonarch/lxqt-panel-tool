@@ -3,7 +3,8 @@
 LXQt Panel Profiles allows to backup, switch, export and import panel configurations.
 It is equivalent to XFCE's panel profiles program and behaves very similarly.
 
-## Build the Debian Package (Debian 12/(L)ubuntu 23.10 or higher)
+## Build the Debian Package
+Note: This requires Debian 12 or Ubuntu 23.10 or higher
 
 ```
 sudo apt install debhelper
