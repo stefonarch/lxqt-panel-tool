@@ -56,7 +56,7 @@ And done!
 ## Screenshots
 
 ### MX Linux
-![img](screenshots/"MX Linux.jpg")
+![img](screenshots/MX-Linux.jpg)
 
 ### MATE
 ![img](screenshots/MATE-profile.jpg)
