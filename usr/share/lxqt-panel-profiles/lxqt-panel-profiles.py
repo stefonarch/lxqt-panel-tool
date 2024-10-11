@@ -100,12 +100,11 @@ class FileListViewer(QWidget):
     def import_panel_layout(self):
         options = QFileDialog.Option(0)
         file_name, _ = QFileDialog.getOpenFileName(self, "Import Panel Layout", "", "Tar Files (*.tar.gz);;All Files (*)", options=options)
-
         if file_name:
             try:
-                with tarfile.open(file_name, "r:gz") as tar:
-                    tar.extractall(path=self.user_layouts_dir)
-                
+                with tarfile.open(file_name, 'r:gz') as tar:
+                    tar.extractall(path=self.user_layouts_dir, filter='fully_trusted')
+
                 extracted_dirs = os.listdir(self.user_layouts_dir)
                 valid_layout = False
                 for directory in extracted_dirs:
