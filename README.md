@@ -3,7 +3,8 @@
 LXQt Panel Profiles allows to backup, switch, export and import panel configurations.
 It is equivalent to XFCE's panel profiles program and behaves very similarly.
 
-## Build the Debian Package (Debian 12 or higher)
+## Build the Debian Package
+Note: This requires Debian 12 or Ubuntu 23.10 or higher
 
 ```
 sudo apt install debhelper
@@ -26,8 +27,8 @@ Install the [AUR package](https://aur.archlinux.org/packages/lxqt-panel-profiles
 ## Manual Installation
 
 First, install the dependencies on your system.
-Note: Some Fedora versions are still using the Qt5 version of LXQt. This will not affect core functionality,
- but it WILL cause LXQt Panel Profiles not following the themes on those systems.
+Note: As is also the case with Debian and Ubuntu, some Fedora versions are still using the Qt5 version of LXQt. 
+This will not affect core functionality, but it WILL cause LXQt Panel Profiles not following the themes on those systems.
 
 ### Fedora 41:
 ```
