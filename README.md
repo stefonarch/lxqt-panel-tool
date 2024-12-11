@@ -19,6 +19,10 @@ cd ..
 sudo apt install ./lxqt-panel-profiles*.deb
 ```
 
+## Arch Linux and derivatives
+
+Install the [AUR package](https://aur.archlinux.org/packages/lxqt-panel-profiles).
+
 ## Manual Installation
 
 First, install the dependencies on your system.
