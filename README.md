@@ -1,33 +1,18 @@
-# LXQt Panel Profiles
-## About
-LXQt Panel Profiles allows to backup, switch, export and import panel configurations.
-It is equivalent to XFCE's panel profiles program and behaves very similarly.
+## LXQt Panel Tool
 
-## Build the Debian Package
-Note: This requires Debian 12 or Ubuntu 23.10 or higher
+> LXQt Panel Tool creates backups and switches different lxqt-panel configurations.
+> It is a fork of https://codeberg.org/MrReplikant/lxqt-panel-profiles.git
 
-```
-sudo apt install debhelper
-cd lxqt-panel-profiles
-dpkg-buildpackage -b
-```
-
-This will generate a `.deb` file for the program in the parent directory.
-To install the package assuming you are still in `lxqt-panel-profiles` directory:
-
-```
-cd ..
-sudo apt install ./lxqt-panel-profiles*.deb
-```
+![Screenshot of lxqt-panel-tool](lxqt-panel-tool.png)
 
 ## Arch Linux and derivatives
 
-Install the [AUR package](https://aur.archlinux.org/packages/lxqt-panel-profiles).
+Install the [AUR package](https://aur.archlinux.org/packages/lxqt-panel-tool).
 
 ## Manual Installation
 
 First, install the dependencies on your system.
-Note: As is also the case with Debian and Ubuntu, some Fedora versions are still using the Qt5 version of LXQt. 
+Note: As is also the case with Debian and Ubuntu, some Fedora versions are still using the Qt5 version of LXQt.
 This will not affect core functionality, but it WILL cause LXQt Panel Profiles not following the themes on those systems.
 
 ### Fedora 41:
@@ -36,7 +21,6 @@ sudo dnf install lxqt-panel tar python3-pyqt6 qt6-qdbusviewer
 ```
 ### Fedora 40:
 ```
-sudo dnf install lxqt-panel tar python3-pyqt6 qt5-qdbusviewer
 ```
 
 ### Alpine Linux Edge:
@@ -46,7 +30,7 @@ apk add lxqt-panel tar py3-pyqt6 qt6-qdbusviewer
 
 ### Arch Linux:
 ```
-sudo pacman -S lxqt-panel tar python-pyqt6 qt6-tools
+sudo pacman -S lxqt-panel python-pyqt6 qt6-tools
 ```
 
 ### Then for ALL of them:

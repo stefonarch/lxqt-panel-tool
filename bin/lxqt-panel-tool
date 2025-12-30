@@ -1,9 +1,9 @@
 #!/bin/bash
 if [ ! -d "$XDG_DATA_HOME/lxqt-panel-profiles/" ]; then
     mkdir -p $XDG_DATA_HOME/lxqt-panel-profiles/
-    cp -r /usr/share/lxqt-panel-profiles/layouts $XDG_DATA_HOME/lxqt-panel-profiles
+    cp -r /usr/share/lxqt-panel-tools/layouts $XDG_DATA_HOME/lxqt-panel-profiles
     mkdir -p $XDG_DATA_HOME/lxqt-panel-profiles/layouts/Backup-"$USER"/
     cp $XDG_CONFIG_HOME/lxqt/panel.conf $XDG_DATA_HOME/lxqt-panel-profiles/layouts/Backup-"$USER"/
 fi
-python3 /usr/share/lxqt-panel-profiles/lxqt-panel-profiles.py
+python3 /usr/share/lxqt-panel-tool/lxqt-panel-tool.py
 

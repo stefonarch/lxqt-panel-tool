@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Exec=lxqt-panel-tool
+Icon=preferences-system
+Categories=Settings;DesktopSettings;Qt;LXQt;
+OnlyShowIn=LXQt;
+
+Name=LXQt Panel Tool
+Comment=Backup and switch your panel configurations
+
+

@@ -1,0 +1,271 @@
+from PyQt6.QtWidgets import QApplication, QListView, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QMessageBox, QFileDialog, QInputDialog, QStyle
+from PyQt6.QtCore import QStringListModel, QDir, Qt, QTranslator, QLocale, QLibraryInfo
+import sys, os, shutil, subprocess
+from configparser import ConfigParser
+
+class NonEditableStringListModel(QStringListModel):
+    def flags(self, index):
+        # Remove the editable flag
+        default_flags = super().flags(index)
+        return default_flags & ~Qt.ItemFlag.ItemIsEditable
+
+class FileListViewer(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.main_layout = QVBoxLayout()
+        self.model = NonEditableStringListModel()
+
+        self.view = QListView()
+        self.view.setModel(self.model)
+        self.main_layout.addWidget(self.view)
+        self.view.selectionModel().selectionChanged.connect(self.on_selection_changed)
+        self.user_layouts_dir = os.path.expanduser("~/.local/share/lxqt-panel-profiles/layouts")
+        self.load_directories_with_panel_conf(self.user_layouts_dir)
+
+        self.button_layout = QHBoxLayout()
+        self.button1_layout = QHBoxLayout()
+        self.save_btn = QPushButton(self.tr('Save'))
+        self.load_btn = QPushButton(self.tr('Load'))
+        self.update_btn = QPushButton(self.tr('Update'))
+        self.rename_btn = QPushButton(self.tr('Rename'))
+        self.delete_btn = QPushButton(self.tr('Delete'))
+
+        self.load_btn.clicked.connect(self.load_panel_conf)
+        self.load_btn.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogApplyButton))
+        self.load_btn.setToolTip(self.tr('Use the selected configuration'))
+        self.load_btn.setEnabled(False)
+
+        self.save_btn.clicked.connect(self.save_current_layout)
+        self.save_btn.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogSaveButton))
+        self.save_btn.setToolTip(self.tr('Save the current configuration'))
+        self.save_btn.setEnabled(False)
+
+        self.rename_btn.clicked.connect(self.rename_selected_directory)
+        self.rename_btn.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_BrowserReload))
+        self.rename_btn.setToolTip(self.tr('Rename the selected configuration'))
+        self.rename_btn.setEnabled(False)
+
+        self.delete_btn.clicked.connect(self.delete_selected_directory)
+        self.delete_btn.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_TrashIcon))
+        self.delete_btn.setToolTip(self.tr('Delete the selected configuration'))
+        self.delete_btn.setEnabled(False)
+
+        self.update_btn.clicked.connect(self.update_configuration)
+        self.update_btn.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_RestoreDefaultsButton))
+        self.update_btn.setToolTip(self.tr('Overwrite the selected configuration\nwith the current configuration'))
+        self.update_btn.setEnabled(False)
+
+        self.close_btn = QPushButton(self.tr("Quit"))
+        self.close_btn.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCloseButton))
+        self.close_btn.clicked.connect(self.close)
+
+        self.button_layout.addWidget(self.save_btn)
+        self.button_layout.addWidget(self.load_btn)
+        self.button_layout.addWidget(self.update_btn)
+        self.button1_layout.addWidget(self.rename_btn)
+        self.button1_layout.addWidget(self.delete_btn)
+        self.button1_layout.addSpacing(20)
+        self.button1_layout.addWidget(self.close_btn)
+
+        self.main_layout.addLayout(self.button_layout)
+        self.main_layout.addLayout(self.button1_layout)
+
+        self.setLayout(self.main_layout)
+        self.setWindowTitle(self.tr("LXQt Panel Tool"))
+
+    def load_directories_with_panel_conf(self, directory_path):
+        dir = QDir(directory_path)
+        # List only directories (no files)
+        dir.setFilter(QDir.Filter.Dirs | QDir.Filter.NoDotAndDotDot)
+        directories = dir.entryList()
+        valid_directories = []
+        for directory in directories:
+            full_path = os.path.join(directory_path, directory)
+            if os.path.exists(os.path.join(full_path, "panel.conf")):
+                valid_directories.append(directory)
+
+        valid_directories.insert(0, self.tr("Current configuration"))
+
+        self.model.setStringList(valid_directories)
+
+    def on_selection_changed(self):
+        indexes = self.view.selectionModel().selectedIndexes()
+
+        self.load_btn.setEnabled(False)
+        self.delete_btn.setEnabled(False)
+        self.rename_btn.setEnabled(False)
+        self.update_btn.setEnabled(False)
+
+        if not indexes:
+            return
+        index = indexes[0]
+        value = index.data()
+
+        if value == self.tr("Current configuration"):
+            self.save_btn.setEnabled(True)
+        else:
+            self.save_btn.setEnabled(False)
+            self.load_btn.setEnabled(True)
+            self.delete_btn.setEnabled(True)
+            self.rename_btn.setEnabled(True)
+            self.update_btn.setEnabled(True)
+
+    def load_panel_conf(self): # is "load"
+        selected_index = self.view.currentIndex()
+        selected_directory = self.model.data(selected_index)
+        source_file = os.path.join(self.user_layouts_dir, selected_directory, "panel.conf")
+        destination_file = os.path.expanduser("~/.config/lxqt/panel.conf")
+        # check for qdbus name
+        for name in ("qdbus6", "qdbus-qt6", "qdbus"):
+            qdbus = shutil.which(name)
+            if qdbus:
+                break
+            else:
+                QMessageBox.critical(self, self.tr("Error"), self.tr("'qdbus' not found - please install it"))
+                return False
+        try:
+            shutil.copy(source_file, destination_file)
+            subprocess.run("qdbus org.lxqt.session /LXQtSession org.lxqt.session.stopModule lxqt-panel.desktop; sleep 1", shell=True, check=True)
+            subprocess.run("qdbus org.lxqt.session /LXQtSession org.lxqt.session.startModule lxqt-panel.desktop", shell=True, check=True)
+        except PermissionError:
+            QMessageBox.critical(self, "Permission Denied", f"Failed to copy panel.conf: Permission denied.")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to copy panel.conf: {str(e)}")
+
+    def delete_selected_directory(self):
+        selected_index = self.view.currentIndex()
+        selected_directory = self.model.data(selected_index)
+        directory_path = os.path.join(self.user_layouts_dir, selected_directory)
+
+        config = self.tr("Delete the panel configuration '%s'?") % selected_directory
+        reply = QMessageBox.question(self, self.tr("Confirm Delete"),config,
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No)
+
+        if reply == QMessageBox.StandardButton.Yes:
+            try:
+                shutil.rmtree(directory_path)
+                self.model.removeRow(selected_index.row())
+            except PermissionError:
+                QMessageBox.critical(self, "Permission Denied", f"Failed to delete directory: Permission denied.")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to delete configuration: {str(e)}")
+
+    def rename_selected_directory(self):
+        selected_index = self.view.currentIndex()
+        selected_directory = self.model.data(selected_index)
+        new_name, ok = QInputDialog.getText(self, self.tr("Rename configuration"), self.tr("Enter new name:"), text=selected_directory)
+
+        if ok:
+            if new_name.strip() == "":
+                QMessageBox.warning(self, self.tr("Invalid Name"), self.tr("A name is required."))
+                return
+            if new_name.strip() == self.tr("Current configuration"):
+
+                QMessageBox.warning(self, self.tr("Invalid Name"), self.tr("Name not allowed."))
+                return
+
+            old_path = os.path.join(self.user_layouts_dir, selected_directory)
+            new_path = os.path.join(self.user_layouts_dir, new_name)
+
+            try:
+                os.rename(old_path, new_path)
+                self.load_directories_with_panel_conf(self.user_layouts_dir)  # Reload the view
+            except Exception as e:
+                QMessageBox.critical(self, self.tr("Error"), f"Failed to rename configuration: {str(e)}")
+
+
+    def save_current_layout(self):
+        name, ok = QInputDialog.getText(self, self.tr("Save Panel Configuration"), self.tr("Enter a name for this panel configuration:"))
+
+        if ok:
+            if name.strip() == "":
+                QMessageBox.warning(self, self.tr("Invalid Name"), self.tr("A name is required."))
+                return
+            if name.strip() == self.tr("Current configuration"):
+
+                QMessageBox.warning(self, self.tr("Invalid Name"), self.tr("Name not allowed."))
+                return
+            target_dir = os.path.join(self.user_layouts_dir, name)
+
+            if os.path.exists(target_dir):
+                reply = QMessageBox.question(
+                    self, "Overwrite Existing",
+                    f"A configuration named '{name}' already exists. Overwrite?",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                    QMessageBox.StandardButton.No
+                )
+                if reply != QMessageBox.StandardButton.Yes:
+                    return  # User chose not to overwrite
+
+            try:
+                os.makedirs(target_dir, exist_ok=True)
+                shutil.copy(os.path.expanduser("~/.config/lxqt/panel.conf"), os.path.join(target_dir, "panel.conf"))
+                self.load_directories_with_panel_conf(self.user_layouts_dir)
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to save configuration: {str(e)}")
+
+    def update_configuration(self):
+        selected_index = self.view.currentIndex()
+        selected_directory = self.model.data(selected_index)
+        directory_path = os.path.join(self.user_layouts_dir, selected_directory)
+        source_file = os.path.join(self.user_layouts_dir, selected_directory, "panel.conf")
+        destination_file = os.path.expanduser("~/.config/lxqt/panel.conf")
+
+        message = self.tr("Overwrite the panel configuration '%s'\nwith the current configuration?") % selected_directory
+
+        reply = QMessageBox.question(self, "Confirm Overwrite", message,
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No)
+
+        if reply == QMessageBox.StandardButton.Yes:
+            try:
+                shutil.copy(destination_file, source_file,)
+                message = self.tr("Configuration '%s' has been updated.") % selected_directory
+                QMessageBox.information(self, self.tr("Configuration updated"), message)
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to update configuration: {str(e)}")
+
+def main():
+    app = QApplication(sys.argv)
+    app.setDesktopFileName("lxqt-panel-tool")
+
+    # Setup translator with XDG_DATA_DIRS lookup
+    locale = QLocale.system().name()  # e.g., "it_IT"
+    language_only = locale.split('_')[0]  # e.g., "it"
+
+    translator = QTranslator()
+    translation_loaded = False
+
+    # Get XDG_DATA_DIRS from environment with fallback
+    xdg_data_dirs = os.environ.get('XDG_DATA_DIRS', '/usr/local/share/:/usr/share/')
+    data_dirs = xdg_data_dirs.split(':')
+
+    # Try both full locale and language-only versions
+    locale_variants = [locale, language_only]
+
+    qt_translator = QTranslator()
+    qt_translations_path = QLibraryInfo.path(QLibraryInfo.LibraryPath.TranslationsPath)
+    if qt_translator.load(f"qt_{language_only}", qt_translations_path):
+        app.installTranslator(qt_translator)
+
+    for locale_var in locale_variants:
+        for data_dir in data_dirs:
+            trans_path = os.path.join(data_dir, "lxqt-panel-tool", "translations", f"lxqt-panel-tool_{locale_var}.qm")
+            if os.path.exists(trans_path) and translator.load(trans_path):
+                app.installTranslator(translator)
+                print(f"Loaded translation: {trans_path}")
+                translation_loaded = True
+                break
+
+    viewer = FileListViewer()
+    viewer.show()
+
+    sys.exit(app.exec())
+
+if __name__ == '__main__':
+    main()
+
+
+
