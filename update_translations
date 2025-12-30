@@ -1,0 +1,8 @@
+#!/bin/bash
+for f in ~/git/stefonarch/lxqt-panel-tool/lxqt-panel-tool/translations/*.ts; do
+    pylupdate6 ~/git/stefonarch/lxqt-panel-tool/lxqt-panel-tool/lxqt-panel-tool.py --no-obsolete --ts "$f"
+    # remove whitespace char
+    sed -i 's/\ \/>/\/>/g' "$f"
+done
+
+#/usr/lib/qt6/bin/lrelease ~/git/stefonarch/niri-settings/translations/niri_settings_*.ts

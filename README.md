@@ -5,51 +5,45 @@
 
 ![Screenshot of lxqt-panel-tool](lxqt-panel-tool.png)
 
-## Arch Linux and derivatives
+### Key Changes
+
+* Simpler  UX with less popup messages.
+* Added translations.
+* Text buttons.
+* Update running configuration with alert for unsaved changes.
+* Move to trash when deleting configurations.
+* Added support for .rpm based distributions.
+* Load default configuration, other layouts shipped.
+* Sharing and archiving has been removed.
+
+For the saved configurations the same directory (`~/.local/share/lxqt-panel-profiles`) is used.
+
+## Installation
+
+### Arch Linux and derivatives
 
 Install the [AUR package](https://aur.archlinux.org/packages/lxqt-panel-tool).
 
-## Manual Installation
+### Debian, derivatives
+```apt
+# apt -y install lxqt-panel python3-pyqt6 qt6-tools ??
+```
+### Fedora
+```
+# dnf install lxqt-panel python-pyqt6 qt6-qdbusviewer ??
+```
+### openSuse
+```
+zypper install lxqt-panel python-PyQt6 ??
 
-First, install the dependencies on your system.
-Note: As is also the case with Debian and Ubuntu, some Fedora versions are still using the Qt5 version of LXQt.
-This will not affect core functionality, but it WILL cause LXQt Panel Profiles not following the themes on those systems.
+```
+Installation as user (to `~/bin` → has to be in your `$PATH`) or systemwide:
 
-### Fedora 41:
-```
-sudo dnf install lxqt-panel tar python3-pyqt6 qt6-qdbusviewer
-```
-### Fedora 40:
-```
-```
-
-### Alpine Linux Edge:
-```
-apk add lxqt-panel tar py3-pyqt6 qt6-qdbusviewer
-```
-
-### Arch Linux:
-```
-sudo pacman -S lxqt-panel python-pyqt6 qt6-tools
+```bash
+git clone https://github.com/stefonarch/lxqt-panel-tool /tmp/
+cd /tmp/lxqt-panel-tool
+chmod a+x install.sh
+./install.sh
 ```
 
-### Then for ALL of them:
-```
-git clone https://codeberg.org/MrReplikant/lxqt-panel-profiles.git
-cd lxqt-panel-profiles
-sudo cp -a usr/* /usr/
-```
 
-And done!
-
-
-## Screenshots
-
-### MX Linux
-![img](screenshots/MX-Linux.jpg)
-
-### MATE
-![img](screenshots/MATE-profile.jpg)
-
-### Redmond (win95)
-![img](screenshots/Redmond.jpg)

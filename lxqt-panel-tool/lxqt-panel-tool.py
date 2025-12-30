@@ -1,6 +1,6 @@
-from PyQt6.QtWidgets import QApplication, QListView, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QMessageBox, QFileDialog, QInputDialog, QStyle
-from PyQt6.QtCore import QStringListModel, QDir, Qt, QTranslator, QLocale, QLibraryInfo
-import sys, os, shutil, subprocess
+from PyQt6.QtWidgets import QApplication, QListView, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QMessageBox, QFileDialog, QInputDialog, QStyle, QLabel
+from PyQt6.QtCore import QStringListModel, QDir, Qt, QTranslator, QLocale, QLibraryInfo, QTimer, QFile
+import sys, os, shutil, subprocess, filecmp
 from configparser import ConfigParser
 
 class NonEditableStringListModel(QStringListModel):
@@ -29,7 +29,7 @@ class FileListViewer(QWidget):
         self.load_btn = QPushButton(self.tr('Load'))
         self.update_btn = QPushButton(self.tr('Update'))
         self.rename_btn = QPushButton(self.tr('Rename'))
-        self.delete_btn = QPushButton(self.tr('Delete'))
+        self.delete_btn = QPushButton(self.tr('Trash'))
 
         self.load_btn.clicked.connect(self.load_panel_conf)
         self.load_btn.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogApplyButton))
@@ -53,21 +53,24 @@ class FileListViewer(QWidget):
 
         self.update_btn.clicked.connect(self.update_configuration)
         self.update_btn.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_RestoreDefaultsButton))
-        self.update_btn.setToolTip(self.tr('Overwrite the selected configuration\nwith the current configuration'))
+        self.update_btn.setToolTip(self.tr('Update the saved configuration\nwith the current configuration'))
         self.update_btn.setEnabled(False)
 
         self.close_btn = QPushButton(self.tr("Quit"))
         self.close_btn.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCloseButton))
         self.close_btn.clicked.connect(self.close)
 
-        self.button_layout.addWidget(self.save_btn)
         self.button_layout.addWidget(self.load_btn)
-        self.button_layout.addWidget(self.update_btn)
-        self.button1_layout.addWidget(self.rename_btn)
-        self.button1_layout.addWidget(self.delete_btn)
+        self.button1_layout.addWidget(self.save_btn)
+        self.button1_layout.addWidget(self.update_btn)
+        self.button_layout.addWidget(self.rename_btn)
+        self.button_layout.addWidget(self.delete_btn)
         self.button1_layout.addSpacing(20)
         self.button1_layout.addWidget(self.close_btn)
 
+        self.status_label = QLabel()
+        self.status_label.setIndent(15)
+        self.main_layout.addWidget(self.status_label)
         self.main_layout.addLayout(self.button_layout)
         self.main_layout.addLayout(self.button1_layout)
 
@@ -76,8 +79,8 @@ class FileListViewer(QWidget):
 
     def load_directories_with_panel_conf(self, directory_path):
         dir = QDir(directory_path)
-        # List only directories (no files)
         dir.setFilter(QDir.Filter.Dirs | QDir.Filter.NoDotAndDotDot)
+        dir.setSorting(QDir.SortFlag.Time)  # newest first
         directories = dir.entryList()
         valid_directories = []
         for directory in directories:
@@ -85,12 +88,14 @@ class FileListViewer(QWidget):
             if os.path.exists(os.path.join(full_path, "panel.conf")):
                 valid_directories.append(directory)
 
-        valid_directories.insert(0, self.tr("Current configuration"))
+        valid_directories.insert(1, "·································")
 
         self.model.setStringList(valid_directories)
 
     def on_selection_changed(self):
         indexes = self.view.selectionModel().selectedIndexes()
+        #self.status_label.setText("")
+        self.show_diff()
 
         self.load_btn.setEnabled(False)
         self.delete_btn.setEnabled(False)
@@ -102,23 +107,31 @@ class FileListViewer(QWidget):
         index = indexes[0]
         value = index.data()
 
-        if value == self.tr("Current configuration"):
+        if "·······" in value:
+            self.save_btn.setEnabled(False)
+            self.update_btn.setEnabled(False)
+            self.save_btn.setEnabled(False)
+            self.load_btn.setEnabled(False)
+            self.delete_btn.setEnabled(False)
+            self.rename_btn.setEnabled(False)
+
+        elif "In use" in value:
             self.save_btn.setEnabled(True)
+            self.update_btn.setEnabled(True)
         else:
             self.save_btn.setEnabled(False)
             self.load_btn.setEnabled(True)
             self.delete_btn.setEnabled(True)
             self.rename_btn.setEnabled(True)
-            self.update_btn.setEnabled(True)
 
-    def load_panel_conf(self): # is "load"
+    def load_panel_conf(self):
         selected_index = self.view.currentIndex()
         selected_directory = self.model.data(selected_index)
         source_file = os.path.join(self.user_layouts_dir, selected_directory, "panel.conf")
         destination_file = os.path.expanduser("~/.config/lxqt/panel.conf")
         # check for qdbus name
-        for name in ("qdbus6", "qdbus-qt6", "qdbus"):
-            qdbus = shutil.which(name)
+        for prog in ("qdbus6", "qdbus-qt6", "qdbus"):
+            qdbus = shutil.which(prog)
             if qdbus:
                 break
             else:
@@ -126,10 +139,22 @@ class FileListViewer(QWidget):
                 return False
         try:
             shutil.copy(source_file, destination_file)
+            # create "In use"
+            target_dir = os.path.join(self.user_layouts_dir, f"In use: {selected_directory}")
+            #remove previous:
+            for name in os.listdir(self.user_layouts_dir):
+                if name.startswith("In use"):
+                    shutil.rmtree(os.path.join(self.user_layouts_dir, name))
+                    break
+            os.makedirs(target_dir)
+            shutil.copy(os.path.expanduser("~/.config/lxqt/panel.conf"), os.path.join(target_dir, "panel.conf"))
+            self.load_directories_with_panel_conf(self.user_layouts_dir)
+
             subprocess.run("qdbus org.lxqt.session /LXQtSession org.lxqt.session.stopModule lxqt-panel.desktop; sleep 1", shell=True, check=True)
             subprocess.run("qdbus org.lxqt.session /LXQtSession org.lxqt.session.startModule lxqt-panel.desktop", shell=True, check=True)
+
         except PermissionError:
-            QMessageBox.critical(self, "Permission Denied", f"Failed to copy panel.conf: Permission denied.")
+            self.status_label.setText(self.tr("Failed to copy panel.conf: Permission denied."))
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to copy panel.conf: {str(e)}")
 
@@ -138,19 +163,22 @@ class FileListViewer(QWidget):
         selected_directory = self.model.data(selected_index)
         directory_path = os.path.join(self.user_layouts_dir, selected_directory)
 
-        config = self.tr("Delete the panel configuration '%s'?") % selected_directory
-        reply = QMessageBox.question(self, self.tr("Confirm Delete"),config,
+        config = self.tr("Move to trash the configuration '%s'?") % selected_directory
+        reply = QMessageBox.question(self, self.tr("Confirm"),config,
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No)
 
         if reply == QMessageBox.StandardButton.Yes:
             try:
-                shutil.rmtree(directory_path)
+                #shutil.rmtree(directory_path)
+                QFile.moveToTrash(directory_path)
                 self.model.removeRow(selected_index.row())
+                self.status_label.setText(self.tr("Configuration moved to trash."))
+                QTimer.singleShot(2000, lambda: self.status_label.setText(""))
             except PermissionError:
-                QMessageBox.critical(self, "Permission Denied", f"Failed to delete directory: Permission denied.")
+                self.status_label.setText(self.tr("Failed to trash configuration:\nPermission denied."))
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to delete configuration: {str(e)}")
+                QMessageBox.critical(self, self.tr("Error"), f"Failed to trash configuration: {str(e)}")
 
     def rename_selected_directory(self):
         selected_index = self.view.currentIndex()
@@ -161,31 +189,23 @@ class FileListViewer(QWidget):
             if new_name.strip() == "":
                 QMessageBox.warning(self, self.tr("Invalid Name"), self.tr("A name is required."))
                 return
-            if new_name.strip() == self.tr("Current configuration"):
-
-                QMessageBox.warning(self, self.tr("Invalid Name"), self.tr("Name not allowed."))
-                return
 
             old_path = os.path.join(self.user_layouts_dir, selected_directory)
             new_path = os.path.join(self.user_layouts_dir, new_name)
 
             try:
                 os.rename(old_path, new_path)
-                self.load_directories_with_panel_conf(self.user_layouts_dir)  # Reload the view
+                self.load_directories_with_panel_conf(self.user_layouts_dir)
             except Exception as e:
                 QMessageBox.critical(self, self.tr("Error"), f"Failed to rename configuration: {str(e)}")
 
 
     def save_current_layout(self):
-        name, ok = QInputDialog.getText(self, self.tr("Save Panel Configuration"), self.tr("Enter a name for this panel configuration:"))
+        name, ok = QInputDialog.getText(self, self.tr("Save Panel Configuration"), self.tr("Enter a name:"))
 
         if ok:
             if name.strip() == "":
                 QMessageBox.warning(self, self.tr("Invalid Name"), self.tr("A name is required."))
-                return
-            if name.strip() == self.tr("Current configuration"):
-
-                QMessageBox.warning(self, self.tr("Invalid Name"), self.tr("Name not allowed."))
                 return
             target_dir = os.path.join(self.user_layouts_dir, name)
 
@@ -197,35 +217,64 @@ class FileListViewer(QWidget):
                     QMessageBox.StandardButton.No
                 )
                 if reply != QMessageBox.StandardButton.Yes:
-                    return  # User chose not to overwrite
+                    return
 
             try:
-                os.makedirs(target_dir, exist_ok=True)
+                current_dir = os.path.join(self.user_layouts_dir, f"In use: {name}")
+                #remove previous:
+                for name in os.listdir(self.user_layouts_dir):
+                    if name.startswith("In use"):
+                        shutil.rmtree(os.path.join(self.user_layouts_dir, name))
+                        break
+                os.makedirs(target_dir)
+                os.makedirs(current_dir)
                 shutil.copy(os.path.expanduser("~/.config/lxqt/panel.conf"), os.path.join(target_dir, "panel.conf"))
+                shutil.copy(os.path.expanduser("~/.config/lxqt/panel.conf"), os.path.join(current_dir, "panel.conf"))
                 self.load_directories_with_panel_conf(self.user_layouts_dir)
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed to save configuration: {str(e)}")
 
     def update_configuration(self):
         selected_index = self.view.currentIndex()
-        selected_directory = self.model.data(selected_index)
-        directory_path = os.path.join(self.user_layouts_dir, selected_directory)
-        source_file = os.path.join(self.user_layouts_dir, selected_directory, "panel.conf")
-        destination_file = os.path.expanduser("~/.config/lxqt/panel.conf")
+#        selected_index = self.model.index(0, 0) try that later
+        current_directory = self.model.data(selected_index) # "In use: name"
+        saved_directory= current_directory.replace("In use: ", "", 1) # "name"
 
-        message = self.tr("Overwrite the panel configuration '%s'\nwith the current configuration?") % selected_directory
+        #directory_path = os.path.join(self.user_layouts_dir, dest_directory)
+        displayed_file = os.path.join(self.user_layouts_dir, current_directory, "panel.conf")
+        saved_file = os.path.join(self.user_layouts_dir, saved_directory, "panel.conf")
+        loaded_file = os.path.expanduser("~/.config/lxqt/panel.conf")
 
-        reply = QMessageBox.question(self, "Confirm Overwrite", message,
+        message = self.tr("Update the saved configuration '%s'\nwith the current configuration?") % saved_directory
+
+        reply = QMessageBox.question(self, "Confirm Update", message,
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No)
 
         if reply == QMessageBox.StandardButton.Yes:
             try:
-                shutil.copy(destination_file, source_file,)
-                message = self.tr("Configuration '%s' has been updated.") % selected_directory
-                QMessageBox.information(self, self.tr("Configuration updated"), message)
+                shutil.copy(loaded_file, displayed_file)
+                shutil.copy(loaded_file, saved_file)
+                message = self.tr("Updated configuration '%s'.") % saved_directory
+                self.status_label.setText(message)
+                QTimer.singleShot(2000, lambda: self.status_label.setText(""))
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed to update configuration: {str(e)}")
+
+    def show_diff(self):
+        selected_index = self.model.index(0, 0)
+        current_directory = self.model.data(selected_index) # "In use: name"
+        dest_directory = current_directory.replace("In use: ", "", 1)
+        full_path = os.path.join(self.user_layouts_dir, dest_directory)
+
+        if os.path.exists(full_path):
+            loaded = os.path.expanduser("~/.config/lxqt/panel.conf")
+            saved = os.path.join(self.user_layouts_dir, dest_directory, "panel.conf")
+
+            if not filecmp.cmp(loaded, saved, shallow=False):
+                self.status_label.setText(self.tr("Configuration in use has unsaved changes."))
+        else:
+            return
 
 def main():
     app = QApplication(sys.argv)
@@ -266,6 +315,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
 
