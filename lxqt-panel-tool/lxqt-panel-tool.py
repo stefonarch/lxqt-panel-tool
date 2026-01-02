@@ -20,14 +20,13 @@ class FileListViewer(QWidget):
         self.view.setModel(self.model)
         self.main_layout.addWidget(self.view)
         self.view.selectionModel().selectionChanged.connect(self.on_selection_changed)
-        self.user_layouts_dir = os.path.expanduser("~/.local/share/lxqt-panel-profiles/layouts")
+        self.user_layouts_dir = os.path.expanduser("~/.local/share/lxqt-panel-tool/layouts")
         self.load_directories_with_panel_conf(self.user_layouts_dir)
 
         self.button_layout = QHBoxLayout()
         self.button1_layout = QHBoxLayout()
-        self.save_btn = QPushButton(self.tr('Save'))
+        self.save_btn = QPushButton(self.tr('Save / Update'))
         self.load_btn = QPushButton(self.tr('Load'))
-        self.update_btn = QPushButton(self.tr('Update'))
         self.rename_btn = QPushButton(self.tr('Rename'))
         self.delete_btn = QPushButton(self.tr('Trash'))
 
@@ -38,7 +37,7 @@ class FileListViewer(QWidget):
 
         self.save_btn.clicked.connect(self.save_current_layout)
         self.save_btn.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogSaveButton))
-        self.save_btn.setToolTip(self.tr('Save the current configuration'))
+        self.save_btn.setToolTip(self.tr('Save or update this configuration'))
         self.save_btn.setEnabled(False)
 
         self.rename_btn.clicked.connect(self.rename_selected_directory)
@@ -48,24 +47,20 @@ class FileListViewer(QWidget):
 
         self.delete_btn.clicked.connect(self.delete_selected_directory)
         self.delete_btn.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_TrashIcon))
-        self.delete_btn.setToolTip(self.tr('Delete the selected configuration'))
+        self.delete_btn.setToolTip(self.tr('Remove the selected configuration'))
         self.delete_btn.setEnabled(False)
-
-        self.update_btn.clicked.connect(self.update_configuration)
-        self.update_btn.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_RestoreDefaultsButton))
-        self.update_btn.setToolTip(self.tr('Update the saved configuration\nwith the current configuration'))
-        self.update_btn.setEnabled(False)
 
         self.close_btn = QPushButton(self.tr("Quit"))
         self.close_btn.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCloseButton))
         self.close_btn.clicked.connect(self.close)
 
         self.button_layout.addWidget(self.load_btn)
-        self.button1_layout.addWidget(self.save_btn)
-        self.button1_layout.addWidget(self.update_btn)
+
+
         self.button_layout.addWidget(self.rename_btn)
         self.button_layout.addWidget(self.delete_btn)
-        self.button1_layout.addSpacing(20)
+        self.button1_layout.addWidget(self.save_btn)
+        self.button1_layout.addStretch()
         self.button1_layout.addWidget(self.close_btn)
 
         self.status_label = QLabel()
@@ -95,21 +90,22 @@ class FileListViewer(QWidget):
     def on_selection_changed(self):
         indexes = self.view.selectionModel().selectedIndexes()
         #self.status_label.setText("")
-        self.show_diff()
+        self.hasupdates = False
 
         self.load_btn.setEnabled(False)
         self.delete_btn.setEnabled(False)
         self.rename_btn.setEnabled(False)
-        self.update_btn.setEnabled(False)
+
 
         if not indexes:
             return
         index = indexes[0]
         value = index.data()
+        self.show_diff()
 
         if "·······" in value:
             self.save_btn.setEnabled(False)
-            self.update_btn.setEnabled(False)
+
             self.save_btn.setEnabled(False)
             self.load_btn.setEnabled(False)
             self.delete_btn.setEnabled(False)
@@ -117,7 +113,7 @@ class FileListViewer(QWidget):
 
         elif "In use" in value:
             self.save_btn.setEnabled(True)
-            self.update_btn.setEnabled(True)
+
         else:
             self.save_btn.setEnabled(False)
             self.load_btn.setEnabled(True)
@@ -201,38 +197,45 @@ class FileListViewer(QWidget):
 
 
     def save_current_layout(self):
-        name, ok = QInputDialog.getText(self, self.tr("Save Panel Configuration"), self.tr("Enter a name:"))
+        print(f"{self.hasupdates}")
 
-        if ok:
-            if name.strip() == "":
-                QMessageBox.warning(self, self.tr("Invalid Name"), self.tr("A name is required."))
-                return
-            target_dir = os.path.join(self.user_layouts_dir, name)
+        if self.hasupdates:
+            self.update_configuration()
 
-            if os.path.exists(target_dir):
-                reply = QMessageBox.question(
-                    self, "Overwrite Existing",
-                    f"A configuration named '{name}' already exists. Overwrite?",
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                    QMessageBox.StandardButton.No
-                )
-                if reply != QMessageBox.StandardButton.Yes:
+
+        else:
+            name, ok = QInputDialog.getText(self, self.tr("Save Panel Configuration"), self.tr("Enter a name:"))
+
+            if ok:
+                if name.strip() == "":
+                    QMessageBox.warning(self, self.tr("Invalid Name"), self.tr("A name is required."))
                     return
+                target_dir = os.path.join(self.user_layouts_dir, name)
 
-            try:
-                current_dir = os.path.join(self.user_layouts_dir, f"In use: {name}")
-                #remove previous:
-                for name in os.listdir(self.user_layouts_dir):
-                    if name.startswith("In use"):
-                        shutil.rmtree(os.path.join(self.user_layouts_dir, name))
-                        break
-                os.makedirs(target_dir)
-                os.makedirs(current_dir)
-                shutil.copy(os.path.expanduser("~/.config/lxqt/panel.conf"), os.path.join(target_dir, "panel.conf"))
-                shutil.copy(os.path.expanduser("~/.config/lxqt/panel.conf"), os.path.join(current_dir, "panel.conf"))
-                self.load_directories_with_panel_conf(self.user_layouts_dir)
-            except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to save configuration: {str(e)}")
+                if os.path.exists(target_dir):
+                    reply = QMessageBox.question(
+                        self, "Overwrite Existing",
+                        f"A configuration named '{name}' already exists. Overwrite?",
+                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                        QMessageBox.StandardButton.No
+                    )
+                    if reply != QMessageBox.StandardButton.Yes:
+                        return
+
+                try:
+                    current_dir = os.path.join(self.user_layouts_dir, f"In use: {name}")
+                    #remove previous:
+                    for name in os.listdir(self.user_layouts_dir):
+                        if name.startswith("In use"):
+                            shutil.rmtree(os.path.join(self.user_layouts_dir, name))
+                            break
+                    os.makedirs(target_dir)
+                    os.makedirs(current_dir)
+                    shutil.copy(os.path.expanduser("~/.config/lxqt/panel.conf"), os.path.join(target_dir, "panel.conf"))
+                    shutil.copy(os.path.expanduser("~/.config/lxqt/panel.conf"), os.path.join(current_dir, "panel.conf"))
+                    self.load_directories_with_panel_conf(self.user_layouts_dir)
+                except Exception as e:
+                    QMessageBox.critical(self, "Error", f"Failed to save configuration: {str(e)}")
 
     def update_configuration(self):
         selected_index = self.view.currentIndex()
@@ -273,6 +276,8 @@ class FileListViewer(QWidget):
 
             if not filecmp.cmp(loaded, saved, shallow=False):
                 self.status_label.setText(self.tr("Configuration in use has unsaved changes."))
+
+                self.hasupdates = True
         else:
             return
 

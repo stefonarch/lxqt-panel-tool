@@ -5,7 +5,7 @@
     <name>FileListViewer</name>
     <message>
         <location filename="../lxqt-panel-tool.py" line="28"/>
-        <source>Save</source>
+        <source>Save / Update</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -35,7 +35,7 @@
     </message>
     <message>
         <location filename="../lxqt-panel-tool.py" line="41"/>
-        <source>Save the current configuration</source>
+        <source>Save or update this configuration</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -60,93 +60,93 @@ with the current configuration</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="78"/>
+        <location filename="../lxqt-panel-tool.py" line="79"/>
         <source>LXQt Panel Tool</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="200"/>
-        <location filename="../lxqt-panel-tool.py" line="181"/>
-        <location filename="../lxqt-panel-tool.py" line="138"/>
+        <location filename="../lxqt-panel-tool.py" line="203"/>
+        <location filename="../lxqt-panel-tool.py" line="184"/>
+        <location filename="../lxqt-panel-tool.py" line="141"/>
         <source>Error</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="138"/>
+        <location filename="../lxqt-panel-tool.py" line="141"/>
         <source>'qdbus' not found - please install it</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="157"/>
+        <location filename="../lxqt-panel-tool.py" line="160"/>
         <source>Failed to copy panel.conf: Permission denied.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="166"/>
+        <location filename="../lxqt-panel-tool.py" line="169"/>
         <source>Move to trash the configuration '%s'?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="167"/>
+        <location filename="../lxqt-panel-tool.py" line="170"/>
         <source>Confirm</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="176"/>
+        <location filename="../lxqt-panel-tool.py" line="179"/>
         <source>Configuration moved to trash.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="179"/>
+        <location filename="../lxqt-panel-tool.py" line="182"/>
         <source>Failed to trash configuration:
 Permission denied.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="186"/>
+        <location filename="../lxqt-panel-tool.py" line="189"/>
         <source>Rename configuration</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="186"/>
+        <location filename="../lxqt-panel-tool.py" line="189"/>
         <source>Enter new name:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="208"/>
-        <location filename="../lxqt-panel-tool.py" line="190"/>
+        <location filename="../lxqt-panel-tool.py" line="218"/>
+        <location filename="../lxqt-panel-tool.py" line="193"/>
         <source>Invalid Name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="208"/>
-        <location filename="../lxqt-panel-tool.py" line="190"/>
+        <location filename="../lxqt-panel-tool.py" line="218"/>
+        <location filename="../lxqt-panel-tool.py" line="193"/>
         <source>A name is required.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="204"/>
+        <location filename="../lxqt-panel-tool.py" line="214"/>
         <source>Save Panel Configuration</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="204"/>
+        <location filename="../lxqt-panel-tool.py" line="214"/>
         <source>Enter a name:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="248"/>
+        <location filename="../lxqt-panel-tool.py" line="258"/>
         <source>Update the saved configuration '%s'
 with the current configuration?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="258"/>
+        <location filename="../lxqt-panel-tool.py" line="268"/>
         <source>Updated configuration '%s'.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../lxqt-panel-tool.py" line="275"/>
+        <location filename="../lxqt-panel-tool.py" line="285"/>
         <source>Configuration in use has unsaved changes.</source>
         <translation type="unfinished"/>
     </message>
