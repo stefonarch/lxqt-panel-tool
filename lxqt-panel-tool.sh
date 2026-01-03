@@ -1,7 +1,7 @@
 #!/bin/bash
 if [ ! -d "$XDG_DATA_HOME/lxqt-panel-tool/" ]; then
     mkdir -p $XDG_DATA_HOME/lxqt-panel-tool/
-    #cp -r /usr/share/lxqt-panel-tools/layouts $XDG_DATA_HOME/lxqt-panel-tool
+    cp -av /usr/share/lxqt-panel-tool/layouts $XDG_DATA_HOME/lxqt-panel-tool/
     mkdir -p $XDG_DATA_HOME/lxqt-panel-tool/layouts/panel-"$USER"/
     mkdir -p $XDG_DATA_HOME/lxqt-panel-tool/layouts/Default\ panel/
     cp /etc/xdg/lxqt/panel.conf $XDG_DATA_HOME/lxqt-panel-tool/layouts/Default\ panel/
@@ -22,6 +22,3 @@ if [ -f "$XDG_DATA_HOME/lxqt-panel-tool/lxqt-panel-tool.py" ]; then
 else
     exec python3 "/usr/share/lxqt-panel-tool/lxqt-panel-tool.py"
 fi
-
-#python3 /usr/share/lxqt-panel-tool/lxqt-panel-tool.py
-#python /home/stef/git/stefonarch/lxqt-panel-tool/lxqt-panel-tool/lxqt-panel-tool.py

@@ -50,7 +50,7 @@ until [[ action == [123] ]]; do
 
             # Install files
             #rm lxqt-panel-tool/translations/*.ts
-            sudo cp -av lxqt-panel-tool /usr/share/
+            sudo cp -av lxqt-panel-tool/ /usr/share/
 
             echo ""
             echo "Installation finished."

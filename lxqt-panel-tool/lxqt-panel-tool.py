@@ -89,13 +89,11 @@ class FileListViewer(QWidget):
 
     def on_selection_changed(self):
         indexes = self.view.selectionModel().selectedIndexes()
-        #self.status_label.setText("")
-        self.hasupdates = False
 
+        self.hasupdates = False
         self.load_btn.setEnabled(False)
         self.delete_btn.setEnabled(False)
         self.rename_btn.setEnabled(False)
-
 
         if not indexes:
             return
@@ -166,7 +164,6 @@ class FileListViewer(QWidget):
 
         if reply == QMessageBox.StandardButton.Yes:
             try:
-                #shutil.rmtree(directory_path)
                 QFile.moveToTrash(directory_path)
                 self.model.removeRow(selected_index.row())
                 self.status_label.setText(self.tr("Configuration moved to trash."))
@@ -197,12 +194,9 @@ class FileListViewer(QWidget):
 
 
     def save_current_layout(self):
-        print(f"{self.hasupdates}")
 
         if self.hasupdates:
             self.update_configuration()
-
-
         else:
             name, ok = QInputDialog.getText(self, self.tr("Save Panel Configuration"), self.tr("Enter a name:"))
 

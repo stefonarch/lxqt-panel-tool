@@ -7,13 +7,13 @@
 
 ### Key Changes
 
-* Simpler  UX with less popup messages.
-* Added translations.
-* Text buttons.
+* Simpler UX with less popup messages.
 * Update running configuration with alert for unsaved changes.
 * Move to trash when deleting configurations.
+* Added translations.
+* Text buttons.
 * Added support for .rpm based distributions.
-* Load default configuration, other layouts shipped.
+* Load default configuration, example layouts shipped.
 * Sharing and archiving has been removed.
 
 For the saved configurations the same directory (`~/.local/share/lxqt-panel-profiles`) is used.
@@ -22,20 +22,19 @@ For the saved configurations the same directory (`~/.local/share/lxqt-panel-prof
 
 ### Arch Linux and derivatives
 
-Install the [AUR package](https://aur.archlinux.org/packages/lxqt-panel-tool).
+Install the [AUR package](https://aur.archlinux.org/packages/lxqt-panel-tool)
 
 ### Debian, derivatives
 ```apt
-# apt -y install lxqt-panel python3-pyqt6 qt6-tools ??
+# apt -y install lxqt-panel python3-pyqt6 qdbus-qt6
 ```
 ### Fedora
 ```
-# dnf install lxqt-panel python-pyqt6 qt6-qdbusviewer ??
+# dnf install lxqt-panel python-pyqt6 qt6-qttools
 ```
 ### openSuse
 ```
-zypper install lxqt-panel python-PyQt6 ??
-
+zypper install lxqt-panel python-PyQt6 qt6-qttools
 ```
 Installation as user (to `~/bin` → has to be in your `$PATH`) or systemwide:
 
