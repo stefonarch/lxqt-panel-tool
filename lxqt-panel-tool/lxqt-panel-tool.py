@@ -123,14 +123,7 @@ class FileListViewer(QWidget):
         selected_directory = self.model.data(selected_index)
         source_file = os.path.join(self.user_layouts_dir, selected_directory, "panel.conf")
         destination_file = os.path.expanduser("~/.config/lxqt/panel.conf")
-        # check for qdbus name
-        for prog in ("qdbus6", "qdbus-qt6", "qdbus"):
-            qdbus = shutil.which(prog)
-            if qdbus:
-                break
-            else:
-                QMessageBox.critical(self, self.tr("Error"), self.tr("'qdbus' not found - please install it"))
-                return False
+
         try:
             shutil.copy(source_file, destination_file)
             # create "In use"
@@ -144,8 +137,15 @@ class FileListViewer(QWidget):
             shutil.copy(os.path.expanduser("~/.config/lxqt/panel.conf"), os.path.join(target_dir, "panel.conf"))
             self.load_directories_with_panel_conf(self.user_layouts_dir)
 
-            subprocess.run("qdbus org.lxqt.session /LXQtSession org.lxqt.session.stopModule lxqt-panel.desktop; sleep 1", shell=True, check=True)
-            subprocess.run("qdbus org.lxqt.session /LXQtSession org.lxqt.session.startModule lxqt-panel.desktop", shell=True, check=True)
+            if shutil.which("qdbus"):
+                subprocess.run("qdbus org.lxqt.session /LXQtSession org.lxqt.session.stopModule lxqt-panel.desktop; sleep 1", shell=True, check=True)
+                subprocess.run("qdbus org.lxqt.session /LXQtSession org.lxqt.session.startModule lxqt-panel.desktop", shell=True, check=True)
+            elif shutil.which("qdbus-qt6"):
+                subprocess.run("qdbus-qt6 org.lxqt.session /LXQtSession org.lxqt.session.stopModule lxqt-panel.desktop; sleep 1", shell=True, check=True)
+                subprocess.run("qdbus-qt6 org.lxqt.session /LXQtSession org.lxqt.session.startModule lxqt-panel.desktop", shell=True, check=True)
+            else:
+                QMessageBox.critical(self, self.tr("Error"), self.tr("'qdbus' command not found, cannot continue"))
+                return False
 
         except PermissionError:
             self.status_label.setText(self.tr("Failed to copy panel.conf: Permission denied."))

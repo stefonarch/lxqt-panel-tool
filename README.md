@@ -12,7 +12,7 @@
 * Move to trash when deleting configurations.
 * Added translations.
 * Text buttons.
-* Added support for .rpm based distributions.
+* Added support for .rpm based distributions (to finish)
 * Load default configuration, example layouts shipped.
 * Sharing and archiving has been removed.
 
@@ -34,12 +34,12 @@ Install the [AUR package](https://aur.archlinux.org/packages/lxqt-panel-tool)
 ```
 ### openSuse
 ```
-zypper install lxqt-panel python-PyQt6 qt6-qttools
+# install lxqt-panel python-PyQt6 qt6-qttools
 ```
 Installation as user (to `~/bin` → has to be in your `$PATH`) or systemwide:
 
 ```bash
-git clone https://github.com/stefonarch/lxqt-panel-tool /tmp/
+git clone https://github.com/stefonarch/lxqt-panel-tool /tmp/lxqt-panel-tool
 cd /tmp/lxqt-panel-tool
 chmod a+x install.sh
 ./install.sh
