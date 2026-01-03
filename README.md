@@ -21,7 +21,7 @@
 
 ### Arch Linux and derivatives
 
-Install the [AUR package](https://aur.archlinux.org/packages/lxqt-panel-tool)
+Install the [AUR package](https://aur.archlinux.org/packages/lxqt-panel-tool-git)
 
 ### Debian, derivatives
 ```apt
