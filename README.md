@@ -1,6 +1,6 @@
 ## LXQt Panel Tool
 
-> LXQt Panel Tool creates backups and switches different lxqt-panel configurations.
+> LXQt Panel Tool saves and switches different lxqt-panel configurations.
 > It is a fork of https://codeberg.org/MrReplikant/lxqt-panel-profiles.git
 
 ![Screenshot of lxqt-panel-tool](lxqt-panel-tool.png)
@@ -12,11 +12,10 @@
 * Move to trash when deleting configurations.
 * Added translations.
 * Text buttons.
-* Added support for .rpm based distributions (to finish)
+* Added support for .rpm based distributions.
 * Load default configuration, example layouts shipped.
 * Sharing and archiving has been removed.
-
-For the saved configurations the same directory (`~/.local/share/lxqt-panel-profiles`) is used.
+* Importing existing profiles from `~/.local/share/lxqt-panel-profiles`.
 
 ## Installation
 
