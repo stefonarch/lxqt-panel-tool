@@ -11,11 +11,16 @@
 * Update running configuration with alert for unsaved changes.
 * Move to trash when deleting configurations.
 * Added translations.
-* Text buttons.
 * Added support for .rpm based distributions.
 * Load default configuration, example layouts shipped.
 * Sharing and archiving has been removed.
 * Importing existing profiles from `~/.local/share/lxqt-panel-profiles`.
+
+### Usage
+
+Customize your panel and save it. Add more panels, customize again and save them. Try some of the panels
+shipped. Switch between configurations and update them when changing some details.
+
 
 ## Installation
 
